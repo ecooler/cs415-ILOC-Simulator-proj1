@@ -1,0 +1,206 @@
+
+<!-- saved from url=(0041)file:///C:/Users/w8452/Desktop/proj1.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"> 
+<title>CS 415, Spring 2019: Project 1</title> 
+<style type="text/css">
+h2 { background:#dddddd }
+</style></head> 
+ 
+
+
+<body bgcolor="white"> 
+<br> 
+ 
+<hr> 
+<center> 
+<h1> 
+<font color="Green"> Local Instruction Scheduling </font> <br> 
+<!--font color=red--> Due date <b> code </b>: Monday, March 4, at 11:59pm
+EST  <br> 
+<!--font color=red--> Due date <b> report </b>: Wednesday, March 6, at 11:59pm EST <br> 
+
+
+</h1> 
+</center> 
+
+<hr> 
+
+ 
+<h2>Modifications and Clarifications</h2> 
+
+<ul>
+ <li> The project does not expect you to analyse accesses to memory. In order to generate correct code, 
+      instructions that read from main memory should not be moved across instructions that write to main memory.
+</li><li> Your schedulers are only allowed to change the order of the instructions in the input basic block. Your scheduler
+     must not perform any other optimizations (e.g.: constant folding, common subexpression elimination, strengh reduction, or "symbolic execution").      
+</li></ul>
+
+<h2>Project Description: PART I</h2> 
+
+THIS IS NOT A GROUP PROJECT! 
+     Every student is expected to work on his own project. You may
+     discuss overall design issues with your fellow students. Detailed
+     discussions and/or code sharing is not allowed. The
+     general rules for academic integrity apply.
+<br><br>
+
+Write three local instruction schedulers (single basic block) based on 
+forward list scheduling. 
+Your scheduler has to be able to accept the following 
+ILOC instructions with their specific latencies 
+given in parenthesis: <br>
+  <ul>
+  <li> arithmetic: <b><i> add (1), sub (1), mult (3), div (3)</i></b> 
+  </li><li> memory <b><i> load (5), loadI (1), loadAI (5), loadAO (5),
+  store (5), storeAI (5), storeAO (5)</i></b> 
+  </li><li> I/O: <b><i> outputAI (1)</i></b> 
+  </li></ul>
+ 
+The posted ILOC simulator uses these listed latencies for the instructions.
+<p> 
+
+</p><h3> Code Shape Requirements </h3>
+
+<ul>
+<li>
+  The register r0 contains the base address 
+  (namely 1024) of the memory area during program execution. 
+</li><li> 
+  You cannot rely on any particular naming strategy of the
+  registers. For example, a code may use r1, r2, and r4, but not r3.
+  However, as mentioned above, r0 is a reserved register that is
+  used for the base address of memory references. 
+</li><li>
+  Your dependence (precedence) graph has only to compute true-dependencies and
+  anti-dependencies on registers in the ILOC code, i.e.,
+  output-dependencies on registers can be ignored since they will be covered through other
+  dependencies in all benchmark codes (see below) 
+</li><li> Any read (load) memory instruction cannot be moved across any
+  write (store) memory instruction. NOTE: loadI is an exception since
+  it does not access memory, so you can move a loadI across a write
+  memory instruction.
+</li><li> output instructions cannot be moved across any write (store)
+  memory instructions.
+</li><li> For extra credit, also perform dependence analysis on memory loadAI
+  and storeAI operations (true and anti dependencies) since the
+  specified offset tells you the particular memory location that is
+  accessed. Therefore, loadAI instructions can be moved across storeAI
+  instructions if both instructions access different memory
+  locations. A similar condition holds for moving outputAI
+  instructions across write (store) memory instructions.   
+</li></ul>
+
+<h3> Deliverables </h3>
+
+You are asked to write three different versions of a forward list
+scheduler. The difference between the schedulers are the heuristics
+used to select among READY instructions. Your executable should be named <i>scheduler</i>, and should allow
+the selection of the three different strategies through command line
+options (-a, -b, and -c). Your scheduler needs to read the input program 
+from standard input, and write the generated
+ILOC instruction sequence to standard output. 
+The three versions are based on the following heuristics: 
+<ul>
+<li>
+  longest latency-weighted path to root (scheduler -a &lt; test.iloc &gt; test-opt.iloc).
+</li><li>
+  highest latency instructions (scheduler -b &lt; test.iloc &gt; test-opt.iloc).
+</li><li>
+  a heuristic of your choice (scheduler -c &lt; test.iloc &gt; test-opt.iloc).   
+</li></ul>
+
+<b> You may use any implementation language that is supported on the
+ilab machines. However, we only provide help with a C
+implementation. </b>. There is some C code that allows you to read in
+ILOC instructions and represent them in a linked list. A list of
+instructions can then be printed to standard output. The provided C code
+can be found in <b>~uli/cs415/projects/proj1/C</b> on ilab. Copy the
+files over into your own directory, and say "make". This will generate
+an executable called "scheduler" in your directory. This directory
+also contains the file <b>lectureExample.iloc</b> from lecture 5/6. 
+You can execute this program using our ILOC simulator (see information
+where to find the simulator below). <br><br>
+
+At a later time, we will provide a benchmark suite of ILOC programs that you will use
+to evaluate the correctness and efficiency of your schedulers. 
+The benchmark programs will be made available in directory <b>~uli/cs415/projects/proj1/benchmarks</b> on
+the ilab cluster. These benchmarks 
+will be the basis for your report. Each benchmark
+program consists of a single basic block. <br><br>
+
+You may test the correctness of the ILOC code generated by your
+schedulers by running it on the ILOC simulator <b> sim </b> provided in
+directory <b>~uli/cs415/ILOC_Simulator</b> on the:
+<a href="http://ilab.rutgers.edu/"> ilab machines </a>. If you want to
+generate the simulator on your own machine, the
+subdirectory src contains the source code of the ILOC simulator. Note:
+the simulator source code is not needed if you want to run your ILOC
+programs on ilab. <br><br>
+
+<h3> Benchmark Programs </h3>
+
+There will be 20 benchmark programs posted at <b>~uli/cs415/projects/proj1/benchmarks</b> on
+the ilab cluster.  This benchmark suite will be the basis for showing 
+the performance differences of your three instruction schedulers. 
+You may add additional benchmarks to showcase particular features of your scheduler. You will need to
+describe these additional files in the ReadMe file for your project.
+
+<br><br>
+
+<h2>Project Description: PART II</h2> 
+
+You will write a project report that discusses the designs of your
+three schedulers and their performance on programs in the benchmark
+suite. You should list the execution times of the programs produced
+by your schedulers in terms of cycles as reported by the
+ILOC simulator. Please 
+include in your report a discussion of the advantages
+and disadvantages of the different scheduling strategies. Particularly, your report should
+include the motivation of your heuristic for the third 
+scheduler. The report should be in PDF format and between 3 and 6
+pages. Please use graphs to show your results.    
+<br><br> 
+ 
+
+<h2> Due Date </h2> 
+Please see above.
+If you have specific, overriding, 
+personal reasons why these dates are unreasonable, you should discuss 
+them directly with the instructor <b>before</b> the deadline. 
+<br><br> 
+ 
+
+<h2>Submission Procedure</h2> 
+
+Please submit a single <b> tar-file  </b> with all your <b> source </b> files, including
+the ReadMe file. Your ReadMe file may contain 
+comments that you want the grader to know about. The grader has to be
+able to execute your schedulers on the ilab machines. Do include any
+additional benchmarks that showcase the benefits of your optional scheduler.
+<b> Do not </b> submit your scheduler as an executable. <b> Do not </b>
+submit the simulator, or the provided example programs. <br><br>
+
+We will use the following <b> late policy </b>: You will receive a penalty of
+20% of your overall grade for each day late. A day is a working day
+(Monday through Friday). 
+
+More details regarding the submission procedure will be posted later. 
+
+<br><br> 
+
+
+<h2>Grading Criteria</h2> 
+
+Your scheduler has to run on the ilab machines. This will allow us
+to perform automatic testing. <font color="red"> You will receive no credit if your
+scheduler does not compile and/or execute on the ilab machines. </font>  
+You should submit a ReadMe file that contains a description of how to
+run your schedulers. <br>
+
+<b> Your overall grade will be based on your code (60%) and your report
+(40%). Show your work. </b>
+ 
+ 
+ 
+ 
+</body></html>
